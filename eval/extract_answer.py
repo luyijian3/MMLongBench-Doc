@@ -1,5 +1,6 @@
 from openai import OpenAI
-client = OpenAI()
+client = OpenAI(api_key="sk-FHMGSN9J5GDLn9QX0a0c1a049a054bC181Ff15A31f74Bd62",
+            base_url="https://svip.xty.app/v1")
 
 
 def extract_answer(question, output, prompt, model_name="gpt-4o"):

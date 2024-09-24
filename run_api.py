@@ -115,7 +115,8 @@ if __name__=="__main__":
 
     if "gpt-4" in args.model_name:
         from openai import OpenAI
-        client = OpenAI()
+        client = OpenAI(api_key="sk-FHMGSN9J5GDLn9QX0a0c1a049a054bC181Ff15A31f74Bd62",
+            base_url="https://svip.xty.app/v1")
     elif "gemini-1.5" in args.model_name:
         import google.generativeai as genai
         client = genai.GenerativeModel(args.model_name)
@@ -133,7 +134,14 @@ if __name__=="__main__":
             samples = json.load(f)
 
     for sample in tqdm(samples):
+        if 'Figure' not in sample['evidence_sources']:
+            # filter data
+            continue
         if "score" in sample:
+            """
+            re-run the first time, once confirmed can store previous results
+            """
+            #pass
             score = sample["score"]
         else:
             messages = process_sample(sample, args)
@@ -171,13 +179,13 @@ if __name__=="__main__":
             sample["response"] = response
             extracted_res = extract_answer(sample["question"], response, prompt)
             sample["extracted_res"] = extracted_res
-            # try:
-            print(extracted_res)
-            pred_ans = extracted_res.split("Answer format:")[0].split("Extracted answer:")[1].strip()
-            score = eval_score(sample["answer"], pred_ans, sample["answer_format"])
-            # except:
-            #     pred_ans = "Failed to extract"
-            #     score = 0.0
+            try:
+                print(extracted_res)
+                pred_ans = extracted_res.split("Answer format:")[0].split("Extracted answer:")[1].strip()
+                score = eval_score(sample["answer"], pred_ans, sample["answer_format"])
+            except:
+                pred_ans = "Failed to extract"
+                score = 0.0
             sample["pred"] = pred_ans
             sample["score"] = score
 
